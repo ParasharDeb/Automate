@@ -11,7 +11,7 @@ model user{
   username  String
   password  String
   email     String        @unique
-  Linkedin  String        
+  Linkedin  String?        
   Posts     Posts[]
 }
 model Posts{

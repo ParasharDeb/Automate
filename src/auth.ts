@@ -1,12 +1,35 @@
 import express, { Router } from 'express'
 import { Signupschema } from './types';
+import { prismaclient } from './db';
+import bcrypt from "bcrypt"
 export const Authroutes:Router=express.Router();
-Authroutes.post("/signup",(req,res)=>{
+Authroutes.post("/signup",async(req,res)=>{
     const parseddata=Signupschema.safeParse(req.body);
-    if(!parseddata){
+    if(!parseddata||!parseddata.success){
         return res.json({message:"Invalid input"})
     }
-    
+    const user = await prismaclient.user.findFirst({
+        where:{
+            email:parseddata.data?.email
+        }
+    })
+    if(user){
+        return res.json({
+            message:"User already exists"
+        })
+    }
+    const hashedpassword= await bcrypt.hash(parseddata.data.password,10)
+    await prismaclient.user.create({
+        data:{
+            email:parseddata.data.email,
+            password:hashedpassword,
+            username:parseddata.data.username,
+        }
+    })
+    res.json({
+        message:"You have succesfully registered"
+    })
+
 })
 Authroutes.post("/signin",(req,res)=>{
 
