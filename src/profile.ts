@@ -4,7 +4,6 @@ import { AuthenticatedRequest } from "./interfaces";
 import { prismaclient } from "./db";
 import bcrypt from 'bcrypt'
 import { Change_passwordschema } from "./types";
-import { id } from "zod/v4/locales/index.cjs";
 export const Profileroutes:Router=express.Router();
 Profileroutes.get("/me",authmiddleware,async(req,res)=>{
     const userId=(req as unknown as AuthenticatedRequest).userId;
@@ -65,4 +64,7 @@ Profileroutes.put("/change_password",authmiddleware,async(req,res)=>{
             message:"Database is down"
         })
     }
+})
+Profileroutes.get("/posts",authmiddleware,(req,res)=>{
+    res.send("GET ALL THE POSTS I MADE IN LINKEDIN")
 })
