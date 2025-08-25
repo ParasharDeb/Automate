@@ -61,8 +61,6 @@ Authroutes.post("/signin",async(req,res)=>{
     })
 })
 Authroutes.post("/Linkedin",(req,res)=>{
-
-})
-Authroutes.post("/twitter",(req,res)=>{
-
+    //todo need to figure out better auth
+    
 })
