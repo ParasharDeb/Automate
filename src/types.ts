@@ -8,3 +8,7 @@ export const Signinschema=z.object({
     email:z.email(),
     password:z.string()
 })
+export const Change_passwordschema=z.object({
+    oldpassword:z.string(),
+    newpassword:z.string(),
+})
