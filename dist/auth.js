@@ -75,6 +75,5 @@ exports.Authroutes.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
     });
 }));
 exports.Authroutes.post("/Linkedin", (req, res) => {
-});
-exports.Authroutes.post("/twitter", (req, res) => {
+    //todo need to figure out better auth
 });

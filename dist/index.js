@@ -12,6 +12,6 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use("/api/v1/auth", auth_1.Authroutes);
-app.use("api/v1/profile", profile_1.Profileroutes);
-app.use("api/v1/makepost", makeposts_1.Postroutes);
+app.use("/api/v1/profile", profile_1.Profileroutes);
+app.use("/api/v1/makepost", makeposts_1.Postroutes);
 app.listen(8080);

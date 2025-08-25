@@ -5,7 +5,7 @@ import axios from "axios";
 import { AI_API_KEY, FIRST_PROMPT } from "./config";
 export const Postroutes:Router=express.Router();
 Postroutes.post("/generate",authmiddleware,async(req,res)=>{
-    const userId = (req as unknown as AuthenticatedRequest).userId;
+  const userId = (req as unknown as AuthenticatedRequest).userId;
   if (!userId) {
     return res.json({
       message: "You are not signed in "

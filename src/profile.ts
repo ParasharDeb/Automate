@@ -7,6 +7,7 @@ import { Change_passwordschema } from "./types";
 export const Profileroutes:Router=express.Router();
 Profileroutes.get("/me",authmiddleware,async(req,res)=>{
     const userId=(req as unknown as AuthenticatedRequest).userId;
+    
     if(!userId){
         return res.json({message:"You are not signed in"})
     }
