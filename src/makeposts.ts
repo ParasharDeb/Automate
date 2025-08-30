@@ -65,9 +65,60 @@ Postroutes.post("/generate",authmiddleware,async(req,res)=>{
     });
   }
 })
-Postroutes.post("/makeapost",authmiddleware,(req,res)=>{
+Postroutes.post("/makeapost", authmiddleware, async (req, res) => {
+  try {
+    const userId = (req as unknown as AuthenticatedRequest).userId;
+    if (!userId) {
+      return res.status(401).json({ message: "You are not authorized" });
+    }
 
-    res.send({
-        message:"need to send the post to linkedin somehow"
-    })
-})
+    // Fetch LinkedIn credentials from DB
+    const user = await prismaclient.user.findUnique({
+      where: { id: userId },
+      select: {
+        LinkedinAccessToken: true,
+        LinkedinAuthorUrn: true,
+      },
+    });
+
+    if (!user || !user.LinkedinAccessToken || !user.LinkedinAuthorUrn) {
+      return res.status(400).json({ message: "LinkedIn credentials missing" });
+    }
+
+    const postContent = req.body.text || "Hello World! This is my first Share on LinkedIn!";
+
+    const postBody = {
+      author: user.LinkedinAuthorUrn,
+      lifecycleState: "PUBLISHED",
+      specificContent: {
+        "com.linkedin.ugc.ShareContent": {
+          shareCommentary: {
+            text: postContent,
+          },
+          shareMediaCategory: "NONE",
+        },
+      },
+      visibility: {
+        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+      },
+    };
+
+    const response = await axios.post("https://api.linkedin.com/v2/ugcPosts", postBody, {
+      headers: {
+        Authorization: `Bearer ${user.LinkedinAccessToken}`,
+        "X-Restli-Protocol-Version": "2.0.0",
+        "Content-Type": "application/json",
+      },
+    });
+
+    res.json({
+      message: "Post created successfully on LinkedIn",
+      linkedInPostId: response.headers["x-restli-id"],
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to create LinkedIn post",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
