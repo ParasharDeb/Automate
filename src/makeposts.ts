@@ -3,6 +3,7 @@ import { authmiddleware } from "./middleware";
 import { AuthenticatedRequest } from "./interfaces";
 import axios from "axios";
 import { AI_API_KEY, FIRST_PROMPT } from "./config";
+import { prismaclient } from "./db";
 export const Postroutes:Router=express.Router();
 Postroutes.post("/generate",authmiddleware,async(req,res)=>{
   const userId = (req as unknown as AuthenticatedRequest).userId;
@@ -19,6 +20,7 @@ Postroutes.post("/generate",authmiddleware,async(req,res)=>{
   }
 
   try {
+    //TODO: Need a better prompt so that extra text is not made
     const response = await axios.post(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
       {
@@ -39,7 +41,20 @@ Postroutes.post("/generate",authmiddleware,async(req,res)=>{
         }
       }
     );
-      const generatedText = response.data.candidates[0].content.parts[0].text;
+    const generatedText = response.data.candidates[0].content.parts[0].text;
+    try {
+      await prismaclient.posts.create({
+        data:{
+          description:generatedText,
+          userId:userId
+        }
+      })
+    } catch (error) {
+      console.log(error)
+      res.json({
+        message:"Database is down"
+      })
+    }
     res.json({
       result: generatedText
     });
@@ -51,6 +66,7 @@ Postroutes.post("/generate",authmiddleware,async(req,res)=>{
   }
 })
 Postroutes.post("/makeapost",authmiddleware,(req,res)=>{
+
     res.send({
         message:"need to send the post to linkedin somehow"
     })
